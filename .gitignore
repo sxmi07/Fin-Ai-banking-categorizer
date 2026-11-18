@@ -1,0 +1,41 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### IDE & Editors ###
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+.classpath
+.project
+.settings/
+.apt_generated/
+.factorypath
+.springBeans
+.recommenders/
+
+### Environment & Secrets ###
+.env
+*.env
+application-local.properties
+application-secret.properties
+
+### Database & Storage ###
+*.mv.db
+*.trace.db
+data/
+h2/
+
+### Logs & Temp ###
+*.log
+*.tmp
+logs/
+temp/
+
+### OS generated ###
+.DS_Store
+Thumbs.db
+desktop.ini

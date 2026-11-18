@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinAI — AI-Powered Banking Transaction Categorizer</title>
+    <meta name="description" content="Transforming raw banking transactions into intelligent financial insights with Spring AI and cloud LLMs.">
+
+    <!-- Google Fonts: Inter, Plus Jakarta Sans, JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5.3.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome 6.5.1 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- FinAI Fintech Custom Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div>
+            <!-- Brand Header -->
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div>
+                    <div class="brand-title">FinAI</div>
+                    <div class="brand-subtitle">Fintech Intelligence</div>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#dashboard" class="nav-link active" data-view="dashboard">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#transactions" class="nav-link" data-view="transactions">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Transactions</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#categorize" class="nav-link" data-view="categorize">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>AI Categorizer</span>
+                        <span class="badge-ai">AI</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#analytics" class="nav-link" data-view="analytics">
+                        <i class="fa-solid fa-chart-column"></i>
+                        <span>Analytics</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#settings" class="nav-link" data-view="settings">
+                        <i class="fa-solid fa-sliders"></i>
+                        <span>Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Sidebar Footer Status Card -->
+        <div class="sidebar-footer">
+            <div class="system-status-card">
+                <div class="system-status-indicator">
+                    <div class="pulse-dot"></div>
+                    <span id="sidebarStatusText">Engine Online</span>
+                </div>
+                <div class="text-secondary" style="font-size: 0.7rem;" id="sidebarAiProvider">
+                    Cloud AI: Gemini 1.5 Flash
+                </div>
+                <div class="mt-2 pt-2 border-top border-secondary text-muted" style="font-size: 0.65rem;">
+                    <i class="fa-solid fa-microchip me-1"></i> 4GB RAM Optimized
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Application Wrapper -->
+    <main class="main-wrapper">
+
+        <!-- Top Navigation Bar -->
+        <header class="topbar">
+            <div class="d-flex align-items-center gap-3">
+                <button class="btn btn-outline-secondary d-lg-none" id="sidebarToggle" aria-label="Toggle Navigation">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div>
+                    <h1 class="topbar-title" id="pageTitle">Financial Overview</h1>
+                    <p class="topbar-subtitle" id="pageSubtitle">Real-time banking analytics and AI categorization</p>
+                </div>
+            </div>
+
+            <div class="topbar-actions">
+                <div class="d-none d-md-flex align-items-center gap-2 px-3 py-1 bg-light rounded-pill border">
+                    <span class="pulse-dot"></span>
+                    <span class="small fw-semibold text-secondary" id="topbarAiMode">AI Active</span>
+                </div>
+
+                <button class="btn btn-primary btn-sm rounded-pill px-3 py-2 fw-semibold d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#newTransactionModal">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>New Transaction</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Body -->
+        <div class="content-body">
+
+            <!-- ========================================================================= -->
+            <!-- 1. DASHBOARD VIEW -->
+            <!-- ========================================================================= -->
+            <section id="view-dashboard" class="app-view">
+                <!-- Dashboard Filters & Controls -->
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+                    <div>
+                        <h4 class="fw-bold mb-1">Financial Performance</h4>
+                        <p class="text-muted small mb-0">Overview of income, expenses, and AI transaction intelligence</p>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <select class="form-select form-select-sm rounded-3 shadow-none border-secondary-subtle" id="dashboardMonthSelector" style="width: 170px;">
+                            <option value="ALL">All Time (Demo)</option>
+                            <option value="CURRENT" selected>Current Month</option>
+                            <option value="PREVIOUS">Previous Month</option>
+                        </select>
+                        <button class="btn btn-outline-secondary btn-sm rounded-3" id="refreshDashboardBtn" title="Refresh Metrics">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Metric Cards Grid -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card kpi-blue">
+                            <div class="kpi-header">
+                                <span class="kpi-label">Total Expenses</span>
+                                <div class="kpi-icon-box icon-blue">
+                                    <i class="fa-solid fa-arrow-trend-down"></i>
+                                </div>
+                            </div>
+                            <div class="kpi-value" id="kpiTotalExpenses">₹0.00</div>
+                            <div class="kpi-subtext">
+                                <span class="text-muted" id="kpiExpenseCount">0 debit transactions</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card kpi-green">
+                            <div class="kpi-header">
+                                <span class="kpi-label">Total Income</span>
+                                <div class="kpi-icon-box icon-green">
+                                    <i class="fa-solid fa-arrow-trend-up"></i>
+                                </div>
+                            </div>
+                            <div class="kpi-value text-success" id="kpiTotalIncome">₹0.00</div>
+                            <div class="kpi-subtext">
+                                <span class="text-success fw-medium"><i class="fa-solid fa-circle-check me-1"></i>Salary & Credits</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card kpi-violet">
+                            <div class="kpi-header">
+                                <span class="kpi-label">AI Categorized</span>
+                                <div class="kpi-icon-box icon-violet">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                </div>
+                            </div>
+                            <div class="kpi-value" id="kpiAiCategorized">0</div>
+                            <div class="kpi-subtext">
+                                <span class="badge bg-primary-subtle text-primary fw-semibold" id="kpiAiAccuracy">98.5% Accuracy</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-sm-6 col-xl-3">
+                        <div class="kpi-card kpi-amber">
+                            <div class="kpi-header">
+                                <span class="kpi-label">Top Category</span>
+                                <div class="kpi-icon-box icon-amber">
+                                    <i class="fa-solid fa-utensils"></i>
+                                </div>
+                            </div>
+                            <div class="kpi-value" id="kpiTopCategory" style="font-size: 1.45rem;">Food</div>
+                            <div class="kpi-subtext text-truncate" id="kpiTopCategoryAmount">
+                                ₹0.00 total spend
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Row -->
+                <div class="row g-4 mb-4">
+                    <!-- Monthly Spending Trend Line Chart -->
+                    <div class="col-12 col-lg-8">
+                        <div class="fintech-card mb-0 h-100">
+                            <div class="fintech-card-header">
+                                <div>
+                                    <h5 class="card-title">Spending & Cash Flow Trend</h5>
+                                    <p class="card-subtitle">Monthly breakdown of outgoing expenses vs incoming credits</p>
+                                </div>
+                                <span class="badge bg-light text-secondary border">Chart.js</span>
+                            </div>
+                            <div style="height: 280px; position: relative;">
+                                <canvas id="chartExpenseTrends"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Category Distribution Doughnut Chart -->
+                    <div class="col-12 col-lg-4">
+                        <div class="fintech-card mb-0 h-100">
+                            <div class="fintech-card-header">
+                                <div>
+                                    <h5 class="card-title">Category Distribution</h5>
+                                    <p class="card-subtitle">Expense share across 10 categories</p>
+                                </div>
+                            </div>
+                            <div style="height: 280px; position: relative;" class="d-flex align-items-center justify-content-center">
+                                <canvas id="chartCategoryDoughnut"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions Card -->
+                <div class="fintech-card">
+                    <div class="fintech-card-header">
+                        <div>
+                            <h5 class="card-title">Recent Transactions</h5>
+                            <p class="card-subtitle">Latest bank descriptions processed by FinAI</p>
+                        </div>
+                        <a href="#transactions" class="btn btn-outline-primary btn-sm rounded-pill px-3" data-view="transactions">
+                            View All <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="fintech-table" id="dashboardRecentTable">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Merchant & Raw Description</th>
+                                    <th>Category</th>
+                                    <th>Type</th>
+                                    <th>Confidence</th>
+                                    <th class="text-end">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashboardRecentTbody">
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">
+                                        <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                                        Loading recent transactions...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ========================================================================= -->
+            <!-- 2. TRANSACTIONS VIEW -->
+            <!-- ========================================================================= -->
+            <section id="view-transactions" class="app-view d-none">
+                <div class="fintech-card">
+                    <!-- Table Search & Filter Toolbar -->
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+                        <!-- Search Input -->
+                        <div class="input-group" style="max-width: 320px;">
+                            <span class="input-group-text bg-light border-end-0 text-muted">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </span>
+                            <input type="text" class="form-control border-start-0 ps-0 shadow-none" id="txSearchInput" placeholder="Search merchant, description...">
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <!-- Category Filter -->
+                            <select class="form-select form-select-sm shadow-none" id="txCategoryFilter" style="width: 140px;">
+                                <option value="">All Categories</option>
+                                <option value="FOOD">Food</option>
+                                <option value="TRAVEL">Travel</option>
+                                <option value="UTILITIES">Utilities</option>
+                                <option value="SHOPPING">Shopping</option>
+                                <option value="ENTERTAINMENT">Entertainment</option>
+                                <option value="HEALTHCARE">Healthcare</option>
+                                <option value="EDUCATION">Education</option>
+                                <option value="RENT">Rent</option>
+                                <option value="TRANSFERS">Transfers</option>
+                                <option value="OTHER">Other</option>
+                            </select>
+
+                            <!-- Type Filter -->
+                            <select class="form-select form-select-sm shadow-none" id="txTypeFilter" style="width: 110px;">
+                                <option value="">All Types</option>
+                                <option value="DEBIT">Debit</option>
+                                <option value="CREDIT">Credit</option>
+                            </select>
+
+                            <!-- Reset Button -->
+                            <button class="btn btn-outline-secondary btn-sm" id="txFilterResetBtn" title="Reset Filters">
+                                <i class="fa-solid fa-filter-circle-xmark"></i>
+                            </button>
+
+                            <!-- Export CSV Button -->
+                            <button class="btn btn-outline-primary btn-sm fw-semibold" id="btnExportCsv" title="Download all records as CSV">
+                                <i class="fa-solid fa-file-csv me-1"></i> Export CSV
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Transactions Table -->
+                    <div class="table-responsive">
+                        <table class="fintech-table" id="transactionsMasterTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Date</th>
+                                    <th>Merchant Name</th>
+                                    <th>Original Bank Description</th>
+                                    <th>Category</th>
+                                    <th>Confidence</th>
+                                    <th>Type</th>
+                                    <th class="text-end">Amount</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionsMasterTbody">
+                                <tr>
+                                    <td colspan="9" class="text-center py-4 text-muted">Loading transactions...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination Footer -->
+                    <div class="d-flex flex-wrap align-items-center justify-content-between pt-3 mt-3 border-top gap-2">
+                        <div class="text-muted small" id="txPaginationInfo">
+                            Showing 0 to 0 of 0 transactions
+                        </div>
+                        <div class="btn-group btn-group-sm" id="txPaginationControls">
+                            <button class="btn btn-outline-secondary" id="txPrevPageBtn" disabled>
+                                <i class="fa-solid fa-chevron-left me-1"></i> Previous
+                            </button>
+                            <button class="btn btn-outline-secondary" id="txNextPageBtn" disabled>
+                                Next <i class="fa-solid fa-chevron-right ms-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ========================================================================= -->
+            <!-- 3. AI CATEGORIZATION VIEW (PRIMARY SPEC FEATURE) -->
+            <!-- ========================================================================= -->
+            <section id="view-categorize" class="app-view d-none">
+                <div class="row g-4">
+                    <!-- Left: Input Console -->
+                    <div class="col-12 col-xl-6">
+                        <div class="fintech-card h-100">
+                            <div class="fintech-card-header">
+                                <div>
+                                    <h5 class="card-title">AI Transaction Parser</h5>
+                                    <p class="card-subtitle">Paste raw bank descriptions or upload statement CSV</p>
+                                </div>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+                                    <i class="fa-solid fa-bolt me-1"></i>Spring AI Ready
+                                </span>
+                            </div>
+
+                            <!-- Sample Quick-Fill Chips -->
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-muted mb-2">Try Sample Bank Statements:</label>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="sample-chip" data-sample="UPI/409283/SWIGGY BANGALORE&#10;BESCOM ELECTRICITY BILL&#10;IRCTC TICKET BOOKING NEW DELHI&#10;NETFLIX SUBSCRIPTION PREMIUM&#10;AMAZON PAY/ORDER/82918">
+                                        <i class="fa-solid fa-wand-magic-sparkles text-primary"></i> 5 Indian Statements
+                                    </span>
+                                    <span class="sample-chip" data-sample="UPI/829182/UBER INDIA&#10;STARBUCKS KORAMANGALA&#10;APOLLO PHARMACY MEDICALS&#10;UDEMY ONLINE COURSE">
+                                        <i class="fa-solid fa-receipt text-success"></i> Travel & Food
+                                    </span>
+                                    <span class="sample-chip" data-sample="POS-TXN-90281 SHOP NO 42 BLR&#10;NEFT/RENT/OCTOBER APARTMENT&#10;NEFT/SALARY/TECHCORP SERVICES">
+                                        <i class="fa-solid fa-question text-amber"></i> Rent & Ambiguous
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Text Area -->
+                            <div class="mb-3">
+                                <label for="rawTransactionsInput" class="form-label small fw-semibold text-muted">
+                                    Raw Transaction Descriptions (One per line):
+                                </label>
+                                <div class="ai-prompt-box">
+                                    <textarea class="form-control border-0 shadow-none p-0" id="rawTransactionsInput" rows="6"
+                                        placeholder="Paste transaction descriptions here...&#10;e.g. UPI/409283/SWIGGY BANGALORE&#10;BESCOM ELECTRICITY BILL&#10;NETFLIX SUBSCRIPTION"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Optional Parameters Accordion -->
+                            <div class="accordion mb-3" id="optionalParamsAccordion">
+                                <div class="accordion-item border-0 bg-light rounded-3">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed py-2 bg-transparent text-secondary small fw-medium" type="button" data-bs-toggle="collapse" data-bs-target="#collapseParams">
+                                            <i class="fa-solid fa-sliders me-2"></i> Optional Amount & Metadata
+                                        </button>
+                                    </h2>
+                                    <div id="collapseParams" class="accordion-collapse collapse" data-bs-parent="#optionalParamsAccordion">
+                                        <div class="accordion-body pt-0">
+                                            <div class="row g-2">
+                                                <div class="col-sm-6">
+                                                    <label class="form-label small text-muted">Default Amount (₹)</label>
+                                                    <input type="number" step="0.01" class="form-control form-control-sm" id="categorizeDefaultAmount" placeholder="e.g. 500.00">
+                                                </div>
+                                                <div class="col-sm-6">
+                                                    <label class="form-label small text-muted">Transaction Date</label>
+                                                    <input type="date" class="form-control form-control-sm" id="categorizeDefaultDate">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Auto Save Toggle -->
+                            <div class="form-check form-switch mb-4">
+                                <input class="form-check-input" type="checkbox" id="categorizeAutoSave" checked>
+                                <label class="form-check-label small text-secondary" for="categorizeAutoSave">
+                                    Automatically save categorized results to transaction history
+                                </label>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="d-flex align-items-center gap-3">
+                                <button class="btn-ai-primary" id="btnRunAiCategorization">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                    <span id="btnRunAiText">Categorize with AI</span>
+                                    <div class="spinner-border spinner-border-sm text-light d-none" id="categorizeSpinner" role="status"></div>
+                                </button>
+
+                                <button class="btn btn-outline-secondary btn-sm" id="btnClearAiInput">
+                                    Clear
+                                </button>
+                            </div>
+
+                            <!-- CSV Upload Section -->
+                            <div class="mt-4 pt-4 border-top">
+                                <label class="form-label small fw-semibold text-muted mb-2">Or Upload Bank Statement CSV:</label>
+                                <div class="csv-dropzone" id="csvDropzone">
+                                    <i class="fa-solid fa-cloud-arrow-up text-primary fs-3 mb-2"></i>
+                                    <div class="fw-semibold text-secondary">Drag & drop CSV statement here</div>
+                                    <div class="text-muted small mt-1">or <span class="text-primary text-decoration-underline">browse file</span></div>
+                                    <input type="file" id="csvFileInput" class="d-none" accept=".csv">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: AI Results Feed -->
+                    <div class="col-12 col-xl-6">
+                        <div class="fintech-card h-100">
+                            <div class="fintech-card-header">
+                                <div>
+                                    <h5 class="card-title">Categorization Intelligence</h5>
+                                    <p class="card-subtitle">Detected merchants, assigned categories & explanations</p>
+                                </div>
+                                <span class="badge bg-light text-muted border" id="aiResultsCountBadge">0 Results</span>
+                            </div>
+
+                            <!-- Results Container -->
+                            <div id="aiResultsContainer" style="max-height: 600px; overflow-y: auto; padding-right: 4px;">
+                                <!-- Empty Placeholder State -->
+                                <div class="text-center py-5 text-muted" id="aiResultsEmptyState">
+                                    <div class="mb-3">
+                                        <i class="fa-solid fa-brain fs-1 text-secondary opacity-50"></i>
+                                    </div>
+                                    <h6 class="fw-semibold text-secondary">No Transactions Analyzed Yet</h6>
+                                    <p class="small text-muted mb-0" style="max-width: 300px; margin: 0 auto;">
+                                        Enter bank descriptions on the left and click "Categorize with AI" to generate real-time intelligent classifications.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ========================================================================= -->
+            <!-- 4. ANALYTICS VIEW -->
+            <!-- ========================================================================= -->
+            <section id="view-analytics" class="app-view d-none">
+                <!-- Analytics Metrics Summary -->
+                <div class="row g-3 mb-4">
+                    <div class="col-12 col-sm-4">
+                        <div class="kpi-card kpi-blue">
+                            <div class="kpi-label">Average Debit Expense</div>
+                            <div class="kpi-value mt-2" id="analyticsAvgDebit">₹0.00</div>
+                            <div class="kpi-subtext text-muted">Per transaction average</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <div class="kpi-card kpi-green">
+                            <div class="kpi-label">Net Financial Savings</div>
+                            <div class="kpi-value text-success mt-2" id="analyticsNetSavings">₹0.00</div>
+                            <div class="kpi-subtext text-success">Total Income minus Outgoing Expenses</div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-sm-4">
+                        <div class="kpi-card kpi-violet">
+                            <div class="kpi-label">Manually Adjusted</div>
+                            <div class="kpi-value mt-2" id="analyticsManualCount">0</div>
+                            <div class="kpi-subtext text-muted">User-refined categorizations</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deep Analytics Charts -->
+                <div class="row g-4 mb-4">
+                    <div class="col-12 col-lg-7">
+                        <div class="fintech-card h-100">
+                            <div class="fintech-card-header">
+                                <div>
+                                    <h5 class="card-title">Category Spending Comparison</h5>
+                                    <p class="card-subtitle">Direct expenditure comparison across all active categories</p>
+                                </div>
+                            </div>
+                            <div style="height: 320px; position: relative;">
+                                <canvas id="chartAnalyticsBar"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-5">
+                        <div class="fintech-card h-100">
+                            <div class="fintech-card-header">
+                                <div>
+                                    <h5 class="card-title">Transaction Volume Distribution</h5>
+                                    <p class="card-subtitle">Number of transactions per category</p>
+                                </div>
+                            </div>
+                            <div style="height: 320px; position: relative;" class="d-flex align-items-center justify-content-center">
+                                <canvas id="chartAnalyticsPolar"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ========================================================================= -->
+            <!-- 5. SETTINGS VIEW -->
+            <!-- ========================================================================= -->
+            <section id="view-settings" class="app-view d-none">
+                <div class="row g-4">
+                    <div class="col-12 col-lg-7">
+                        <!-- Application & AI Configuration -->
+                        <div class="fintech-card">
+                            <div class="fintech-card-header">
+                                <div>
+                                    <h5 class="card-title">AI Engine & Provider Status</h5>
+                                    <p class="card-subtitle">Configuration parameters for Google Gemini and heuristic fallback</p>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-secondary">Active AI Provider:</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-primary px-3 py-2 rounded-pill" id="settingsAiBadge">
+                                        <i class="fa-solid fa-robot me-1"></i> Google Gemini 1.5 Flash
+                                    </span>
+                                    <span class="badge bg-secondary-subtle text-secondary px-3 py-2 rounded-pill">
+                                        <i class="fa-solid fa-shield-halved me-1"></i> Rule-Based Fallback Enabled
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small fw-semibold text-secondary">API Key Configuration Guidance:</label>
+                                <div class="bg-light p-3 rounded-3 border small text-secondary">
+                                    <ol class="mb-0 ps-3">
+                                        <li>Generate a free API key at <a href="https://aistudio.google.com/" target="_blank" class="fw-semibold text-primary">Google AI Studio</a>.</li>
+                                        <li>Set the environment variable: <code>export GEMINI_API_KEY="your_api_key"</code> or add it to <code>.env</code>.</li>
+                                        <li>If no API key is provided, FinAI automatically activates <strong>Rule-Based Heuristic Mode</strong> so all features remain 100% operational offline.</li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Demo Data Controls -->
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div>
+                                    <h6 class="fw-bold mb-1">Reset Demonstration Data</h6>
+                                    <p class="text-muted small mb-0">Reload 30 sample Indian banking transactions for portfolio showcase</p>
+                                </div>
+                                <button class="btn btn-outline-danger btn-sm rounded-pill px-3" id="btnResetDemoData">
+                                    <i class="fa-solid fa-arrows-rotate me-1"></i> Reload Sample Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-5">
+                        <!-- System Profile Card -->
+                        <div class="fintech-card">
+                            <div class="fintech-card-header">
+                                <h5 class="card-title">System & Environment</h5>
+                            </div>
+                            <ul class="list-group list-group-flush small">
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span class="text-muted">Application Version</span>
+                                    <span class="fw-semibold">1.0.0-SNAPSHOT</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span class="text-muted">Java Runtime</span>
+                                    <span class="fw-semibold">Java 17 (OpenJDK Temurin)</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span class="text-muted">Database Engine</span>
+                                    <span class="fw-semibold">H2 Persistent File Storage</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span class="text-muted">Hardware Profile</span>
+                                    <span class="fw-semibold text-primary">4GB RAM Monolith Optimized</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between px-0">
+                                    <span class="text-muted">H2 Console Path</span>
+                                    <a href="/h2-console" target="_blank" class="fw-semibold text-decoration-none">/h2-console</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+</div>
+
+
+<!-- ========================================================================= -->
+<!-- MODALS -->
+<!-- ========================================================================= -->
+
+<!-- 1. Manual Category Edit Modal (Section 11) -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="editCategoryModalLabel">
+                    <i class="fa-solid fa-pen-to-square text-primary me-2"></i>Adjust Transaction Category
+                </h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editTxId">
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold text-muted">Original Description:</label>
+                    <div class="p-2 bg-light rounded border small text-break" id="editTxDescription"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="editTxCategory" class="form-label small fw-semibold text-muted">Select New Category:</label>
+                    <select class="form-select" id="editTxCategory">
+                        <option value="FOOD">Food (Groceries, dining, delivery)</option>
+                        <option value="TRAVEL">Travel (Cabs, transit, flights, fuel)</option>
+                        <option value="UTILITIES">Utilities (Electricity, internet, mobile)</option>
+                        <option value="SHOPPING">Shopping (E-commerce, apparel, retail)</option>
+                        <option value="ENTERTAINMENT">Entertainment (Streaming, cinema, gaming)</option>
+                        <option value="HEALTHCARE">Healthcare (Pharmacy, doctors, clinics)</option>
+                        <option value="EDUCATION">Education (Courses, tuition, books)</option>
+                        <option value="RENT">Rent (Apartment rent, maintenance)</option>
+                        <option value="TRANSFERS">Transfers (P2P, salary, interest)</option>
+                        <option value="OTHER">Other (Ambiguous, general)</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="editTxSubcategory" class="form-label small fw-semibold text-muted">Specific Subcategory (Optional):</label>
+                    <input type="text" class="form-control" id="editTxSubcategory" placeholder="e.g. Food Delivery, Groceries">
+                </div>
+            </div>
+            <div class="modal-footer border-top">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary btn-sm px-4 fw-semibold" id="btnSaveCategoryEdit">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 2. New Transaction Entry Modal -->
+<div class="modal fade" id="newTransactionModal" tabindex="-1" aria-labelledby="newTransactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom">
+                <h5 class="modal-title fw-bold" id="newTransactionModalLabel">
+                    <i class="fa-solid fa-plus-circle text-primary me-2"></i>Create New Transaction
+                </h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newTransactionForm">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-muted">Transaction Description *</label>
+                        <input type="text" class="form-control" id="newTxDescription" required placeholder="e.g. UPI/9921/ZOMATO ORDER">
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-sm-6">
+                            <label class="form-label small fw-semibold text-muted">Amount (₹) *</label>
+                            <input type="number" step="0.01" class="form-control" id="newTxAmount" required placeholder="0.00">
+                        </div>
+                        <div class="col-sm-6">
+                            <label class="form-label small fw-semibold text-muted">Date</label>
+                            <input type="date" class="form-control" id="newTxDate">
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold text-muted">Transaction Type</label>
+                        <select class="form-select" id="newTxType">
+                            <option value="DEBIT" selected>Debit (Expense)</option>
+                            <option value="CREDIT">Credit (Income)</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-top">
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary btn-sm px-4 fw-semibold" id="btnSubmitNewTx">Create Transaction</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notifications Container -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1090;">
+    <div id="appToast" class="toast align-items-center text-white bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body" id="toastMessage">Notification message</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts: Bootstrap Bundle & Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+<!-- FinAI Application Logic -->
+<script src="js/app.js"></script>
+
+</body>
+</html>
