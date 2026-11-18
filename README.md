@@ -1,6 +1,6 @@
 # FinAI — Intelligent Banking Transaction Categorizer
 ## 🚀 Live Demo
-🔗 **[Open Live FinAI App](https://YOUR-RENDER-LINK.onrender.com)**  
+🔗 **[Open Live FinAI App](https://fin-ai-banking-categorizer.onrender.com/#transactions)**  
 *(Hosted on Render Free Tier — first load takes ~30–40 seconds while the server wakes up.)*
 
 [![Java 17](https://img.shields.io/badge/Java-17-orange.svg)](https://adoptium.net/)
